@@ -1,8 +1,6 @@
 package bots
 
 import (
-	"fmt"
-
 	"github.com/gracig/mstreamer"
 )
 
@@ -17,17 +15,14 @@ func NewPingPongFilter() (mstreamer.Filter, error) {
 			if msgIn != "ping" && msgIn != "pong" {
 				return
 			}
-			for i := 0; i < 50; i++ {
-				var msgOut string
-				switch msgIn {
-				case "ping":
-					msgOut = "pong"
-				case "pong":
-					msgOut = "ping"
-				}
-				m.InsertOrUpdateTag(MessageOut, fmt.Sprintf("%v-%v", msgOut, i))
-				mw.Write(*m)
+			var msgOut string
+			switch msgIn {
+			case "ping":
+				msgOut = "pong"
+			case "pong":
+				msgOut = "ping"
 			}
-
+			m.InsertOrUpdateTag(MessageOut, msgOut)
+			mw.Write(*m)
 		}, nil)
 }

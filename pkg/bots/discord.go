@@ -21,8 +21,6 @@ func NewDiscordBot(token string) (mstreamer.Input, mstreamer.Output, error) {
 		dg.Identify.Intents |= discordgo.IntentGuildMessages
 		dg.Identify.Intents |= discordgo.IntentsMessageContent
 		dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-			fmt.Printf("Author: %v, User: %v\n", m.Author.ID, s.State.User.ID)
 			if m.Author.ID == s.State.User.ID {
 				return
 			}
@@ -51,7 +49,6 @@ func NewDiscordBot(token string) (mstreamer.Input, mstreamer.Output, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating Discord input listener - %v", err)
 	}
-
 	output, err := mstreamer.NewOutput(func(m mstreamer.Measure) error {
 		if m.Name != DiscordName {
 			return fmt.Errorf("ignoring non-discord message %v", m)
