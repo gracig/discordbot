@@ -2,34 +2,35 @@ package main
 
 import (
 	"discordbot/pkg/bots"
-	"flag"
 	"log"
+	"os"
 
 	"github.com/gracig/mstreamer"
 )
 
-// Variables used for command line parameters
-var (
-	Token string
-)
-
-func init() {
-	flag.StringVar(&Token, "t", "", "Bot Token")
-	flag.Parse()
-}
-
 func main() {
 
-	input, output, err := bots.NewDiscordBot(Token)
+	input, output, err := bots.NewDiscordBot(os.Getenv("DISCORD_TOKEN"))
 	if err != nil {
 		log.Fatalf("error creating discord bot")
 	}
+
 	pingpong, err := bots.NewPingPongFilter()
 	if err != nil {
 		log.Fatalf("error creating ping pong filter")
 	}
 
-	pipeline, err := mstreamer.NewIOPipeline(input, pingpong, output)
+	greeting, err := bots.NewGreetingFilter()
+	if err != nil {
+		log.Fatalf("error creating greeting filter")
+	}
+
+	filter, err := mstreamer.NewComposedFilter(pingpong, greeting)
+	if err != nil {
+		log.Fatalf("error creating composed filter")
+	}
+
+	pipeline, err := mstreamer.NewIOPipeline(input, filter, output)
 
 	if err != nil {
 		log.Fatalf("Could not create bot pipeline")

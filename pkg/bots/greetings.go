@@ -1,10 +1,12 @@
 package bots
 
 import (
+	"time"
+
 	"github.com/gracig/mstreamer"
 )
 
-func NewPingPongFilter() (mstreamer.Filter, error) {
+func NewGreetingFilter() (mstreamer.Filter, error) {
 	return mstreamer.NewFilter(
 		func(f mstreamer.Feedback, m *mstreamer.Measure, mw mstreamer.MeasureWriter) {
 			msgIn, err := m.TagValue(MessageIn)
@@ -13,16 +15,16 @@ func NewPingPongFilter() (mstreamer.Filter, error) {
 				mw.Write(*m)
 				return
 			}
-			if msgIn != "ping" && msgIn != "pong" && msgIn != "ping ping" {
+			if msgIn != "olá" {
 				mw.Write(*m)
 				return
 			}
-			var msgOut string
-			switch msgIn {
-			case "ping":
-				msgOut = "pong"
-			case "pong":
-				msgOut = "ping"
+			var h, _, _ = time.Unix(m.Time, 0).Clock()
+			var msgOut = "Good Morning"
+			if h >= 12 && h < 18 {
+				msgOut = "Good Afternoon"
+			} else if h >= 18 {
+				msgOut = "Good Evening"
 			}
 			m.InsertOrUpdateTag(MessageOut, msgOut)
 			mw.Write(*m)
